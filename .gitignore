@@ -2,7 +2,7 @@
 *.sonarj
 *.sw*
 .DS_Store
-.settings
+#.settings
 .springBeans
 bin
 build.sh
@@ -17,9 +17,9 @@ argfile*
 pom.xml
 
 /build
-buildSrc/build
+#buildSrc/build
 /spring-*/build
-target/
+#target/
 
 # Eclipse artifacts, including WTP generated manifests
 .classpath

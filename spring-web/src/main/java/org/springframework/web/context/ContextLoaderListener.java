@@ -20,7 +20,13 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 /**
- * 开启应用的引导程序的监听器类，以及 关闭Spring的根应用上下文 WebApplicationContext
+ * 开启应用的引导程序的监听器类，以及 关闭Spring的根应用上下文 WebApplicationContext。
+ *
+ * web.xml文件中 ，监听器必须注册在 Log4jConfigListener 之后。
+ *
+ * 在Spring 3.1 之后，ContextLoaderListener 支持通过构造函数ContextLoaderListener(WebApplicationContext) 注入根web应用上下文，
+ * 允许在 Servlet 3.0+ 环境里 通过程序编码配置。
+ *
  * Bootstrap listener to start up and shut down Spring's root {@link WebApplicationContext}.
  * Simply delegates to {@link ContextLoader} as well as to {@link ContextCleanupListener}.
  *
@@ -45,6 +51,13 @@ public class ContextLoaderListener extends ContextLoader implements ServletConte
 
 
 	/**
+     * 创建一个ContextLoaderListener 对象的时候，将会创建一个web应用的上下文，而这个上下文，需要给予contextConfigLocation配置中
+     * 的参数值，因此，在 web.xml 文件内部需要配置contextConfigLocation 项，否则会出现Error，无法启动spring 应用。
+     * Note：如果没有配置，在ContextLoader内部会默认配置一个文件地址：/WEB-INF/applicationContext.xml,所以如果你不想配置，
+     * 则需要创建/WEB-INF/applicationContext.xml文件。
+     *
+     * 此外，创建了应用上下文 将被注册到 ServletContext，其属性名为：WebApplicationContext.ROOT .ServletContext维护的是一个Map的数据结构.
+     *
 	 * Create a new {@code ContextLoaderListener} that will create a web application
 	 * context based on the "contextClass" and "contextConfigLocation" servlet
 	 * context-params. See {@link ContextLoader} superclass documentation for details on
@@ -65,6 +78,11 @@ public class ContextLoaderListener extends ContextLoader implements ServletConte
 	}
 
 	/**
+     * 使用给定的 应用上下文 来创建一个新的 ContextLoaderListener 对象。该方法让我们可以通过 addListener 方法在
+     * Servlet 3.0+ 环境下注册监听器
+     *
+     *
+     *
 	 * Create a new {@code ContextLoaderListener} with the given application context. This
 	 * constructor is useful in Servlet 3.0+ environments where instance-based
 	 * registration of listeners is possible through the {@link javax.servlet.ServletContext#addListener}

@@ -664,6 +664,7 @@ public abstract class AbstractAspectJAdvisorFactoryTests {
 			return count++;
 		}
 
+        //计算 返回为void 类型的方法执行次数
 		@Before("execution(void *.*(..))")
 		public void countAnythingVoid() {
 			++count;

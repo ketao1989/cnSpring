@@ -178,6 +178,8 @@ import javax.servlet.ServletException;
 public interface WebApplicationInitializer {
 
 	/**
+     * 为了初始化这个web应用，给指定的 ServletContext 配置任何 servlets, filters, listeners 参数和属性。
+     *
 	 * Configure the given {@link ServletContext} with any servlets, filters, listeners
 	 * context-params and attributes necessary for initializing this web application. See
 	 * examples {@linkplain WebApplicationInitializer above}.
