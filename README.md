@@ -1,4 +1,4 @@
 cnSpring
 ========
 
-Spring 源码加一些学习注释。
+Spring MVC 相关源码加一些学习注释。
