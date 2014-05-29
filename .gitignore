@@ -1,5 +1,6 @@
 *.java.hsp
 *.sonarj
+*.class
 *.sw*
 .DS_Store
 .settings
