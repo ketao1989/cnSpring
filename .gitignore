@@ -1,10 +1,7 @@
 *.java.hsp
 *.sonarj
-<<<<<<< HEAD
 .idea/
-=======
 *.class
-
 *.sw*
 .DS_Store
 .settings
