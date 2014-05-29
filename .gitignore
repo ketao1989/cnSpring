@@ -1,9 +1,13 @@
 *.java.hsp
 *.sonarj
+<<<<<<< HEAD
 .idea/
+=======
+*.class
+
 *.sw*
 .DS_Store
-#.settings
+.settings
 .springBeans
 bin
 build.sh
@@ -19,7 +23,11 @@ argfile*
 pom.xml
 
 /build
+<<<<<<< HEAD
 buildSrc/build/
+=======
+buildSrc/build
+>>>>>>> FETCH_HEAD
 /spring-*/build
 #target/
 
