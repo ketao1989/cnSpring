@@ -1,5 +1,6 @@
 *.java.hsp
 *.sonarj
+.idea/
 *.sw*
 .DS_Store
 #.settings
@@ -13,11 +14,12 @@ jmx.log
 derby.log
 spring-test/test-output/
 .gradle
+gradle
 argfile*
 pom.xml
 
 /build
-#buildSrc/build
+buildSrc/build/
 /spring-*/build
 #target/
 
