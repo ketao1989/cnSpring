@@ -2,7 +2,7 @@
 *.sonarj
 *.sw*
 .DS_Store
-#.settings
+.settings
 .springBeans
 bin
 build.sh
@@ -17,7 +17,7 @@ argfile*
 pom.xml
 
 /build
-#buildSrc/build
+buildSrc/build
 /spring-*/build
 #target/
 
