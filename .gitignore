@@ -20,11 +20,7 @@ argfile*
 pom.xml
 
 /build
-<<<<<<< HEAD
-buildSrc/build/
-=======
 buildSrc/build
->>>>>>> FETCH_HEAD
 /spring-*/build
 #target/
 
