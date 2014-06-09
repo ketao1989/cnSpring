@@ -87,6 +87,8 @@ public abstract class BeanUtils {
 	}
 
 	/**
+     * 使用指定的类的无参构造函数来实例化一个类
+     *
 	 * Instantiate a class using its no-arg constructor.
 	 * As this method doesn't try to load classes by name, it should avoid
 	 * class-loading issues.
@@ -102,7 +104,7 @@ public abstract class BeanUtils {
 			throw new BeanInstantiationException(clazz, "Specified class is an interface");
 		}
 		try {
-			return instantiateClass(clazz.getDeclaredConstructor());
+			return instantiateClass(clazz.getDeclaredConstructor());//通过反射getConstructor0方法获取默认参数为0个的构造函数
 		}
 		catch (NoSuchMethodException ex) {
 			throw new BeanInstantiationException(clazz, "No default constructor found", ex);
