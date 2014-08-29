@@ -292,10 +292,7 @@ public class ContextLoader {
             if (this.context instanceof ConfigurableWebApplicationContext) { // 只支持对ConfigurableWebApplicationContext类型实例的处理
                 ConfigurableWebApplicationContext cwac = (ConfigurableWebApplicationContext) this.context;
                 if (!cwac.isActive()) { // 上下文是否被refreshed 和 没有被关闭
-                    // 当上下文没有呗refreshed，则提供服务来设置parent上下文，设置应用上下文id等
-
-                    // The context has not yet been refreshed -> provide services such as
-                    // setting the parent context, setting the application context id, etc
+                    // 当上下文没有被refreshed，则提供服务来设置parent上下文，设置应用上下文id等
                     if (cwac.getParent() == null) {
                         // The context instance was injected without an explicit parent ->
                         // determine parent for root web application context, if any.
@@ -531,6 +528,8 @@ public class ContextLoader {
     }
 
     /**
+     * 默认实现的模板方法，去加载或者获取一个 ApplicationContext 实例，这个实例将被用来作为根WebApplicationContext 的 parent 上下文
+     *
      * Template method with default implementation (which may be overridden by a subclass), to load or obtain an
      * ApplicationContext instance which will be used as the parent context of the root WebApplicationContext. If the
      * return value from the method is null, no parent context is set.
