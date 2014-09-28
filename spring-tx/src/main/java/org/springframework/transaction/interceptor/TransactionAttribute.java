@@ -32,6 +32,8 @@ import org.springframework.transaction.TransactionDefinition;
 public interface TransactionAttribute extends TransactionDefinition {
 
 	/**
+     * 关联在事务属性的一个限定值。通过这个名字来选择对应的事务管理器处理指定的事务。
+     *
 	 * Return a qualifier value associated with this transaction attribute.
 	 * <p>This may be used for choosing a corresponding transaction manager
 	 * to process this specific transaction.
@@ -39,6 +41,8 @@ public interface TransactionAttribute extends TransactionDefinition {
 	String getQualifier();
 
 	/**
+     * 是否在给定的异常上回滚
+     *
 	 * Should we roll back on the given exception?
 	 * @param ex the exception to evaluate
 	 * @return whether to perform a rollback or not

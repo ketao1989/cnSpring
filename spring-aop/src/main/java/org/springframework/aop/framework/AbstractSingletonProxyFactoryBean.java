@@ -149,6 +149,7 @@ public abstract class AbstractSingletonProxyFactoryBean extends ProxyConfig
 		}
 
 		// Add the main interceptor (typically an Advisor).
+        // 这个方法由具体的实现类来实现，类似模板设计模式。
 		proxyFactory.addAdvisor(this.advisorAdapterRegistry.wrap(createMainInterceptor()));
 
 		if (this.postInterceptors != null) {
@@ -219,10 +220,10 @@ public abstract class AbstractSingletonProxyFactoryBean extends ProxyConfig
 
 
 	/**
-	 * Create the "main" interceptor for this proxy factory bean.
-	 * Typically an Advisor, but can also be any type of Advice.
-	 * <p>Pre-interceptors will be applied before, post-interceptors
-	 * will be applied after this interceptor.
+     *
+     * 创建主要的拦截器逻辑给这个代理工厂bean。在这个Main拦截器（可能是一个AOP通知器）之前，会有一个pre-interceptors；
+     * 同样，在这个Main之后，还会有一个post-interceptors拦截器。
+     *
 	 */
 	protected abstract Object createMainInterceptor();
 

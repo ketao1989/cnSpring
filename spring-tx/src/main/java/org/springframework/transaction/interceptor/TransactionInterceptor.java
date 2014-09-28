@@ -29,16 +29,12 @@ import java.io.Serializable;
 import java.util.Properties;
 
 /**
- * AOP Alliance MethodInterceptor for declarative transaction
- * management using the common Spring transaction infrastructure
- * ({@link org.springframework.transaction.PlatformTransactionManager}).
+ * 基于AOP的方法拦截器，目的是使用通用的spring事务基础数据结构PlatformTransactionManager完成声明式事务管理。
  *
- * <p>Derives from the {@link TransactionAspectSupport} class which
- * contains the integration with Spring's underlying transaction API.
- * TransactionInterceptor simply calls the relevant superclass methods
- * such as {@link #invokeWithinTransaction} in the correct order.
+ *  继承自TransactionAspectSupport类(包含spring基本的事务API集合)的TransactionInterceptor 只是简单调用了
+ *  父类相关的方法，比如 invokeWithinTransaction方法。
  *
- * <p>TransactionInterceptors are thread-safe.
+ *  此外，本类是线程安全的。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -50,8 +46,8 @@ import java.util.Properties;
 public class TransactionInterceptor extends TransactionAspectSupport implements MethodInterceptor, Serializable {
 
 	/**
-	 * Create a new TransactionInterceptor.
-	 * <p>Transaction manager and transaction attributes still need to be set.
+     * 创建一个新的TransactionInterceptor ，但是需要注意的是，事务管理器和事务属性仍然必须设置才可以使用。
+     *
 	 * @see #setTransactionManager
 	 * @see #setTransactionAttributes(java.util.Properties)
 	 * @see #setTransactionAttributeSource(TransactionAttributeSource)
@@ -60,6 +56,8 @@ public class TransactionInterceptor extends TransactionAspectSupport implements 
 	}
 
 	/**
+     * 使用属性来创建一个 事务拦截器
+     *
 	 * Create a new TransactionInterceptor.
 	 * @param ptm the transaction manager to perform the actual transaction management
 	 * @param attributes the transaction attributes in properties format
@@ -84,6 +82,7 @@ public class TransactionInterceptor extends TransactionAspectSupport implements 
 	}
 
 
+    // 完成AOP需要实现的接口方法
 	public Object invoke(final MethodInvocation invocation) throws Throwable {
 		// Work out the target class: may be {@code null}.
 		// The TransactionAttributeSource should be passed the target class
@@ -91,6 +90,7 @@ public class TransactionInterceptor extends TransactionAspectSupport implements 
 		Class<?> targetClass = (invocation.getThis() != null ? AopUtils.getTargetClass(invocation.getThis()) : null);
 
 		// Adapt to TransactionAspectSupport's invokeWithinTransaction...
+        // 这里会实际调用拦截的方法
 		return invokeWithinTransaction(invocation.getMethod(), targetClass, new InvocationCallback() {
 			public Object proceedWithInvocation() throws Throwable {
 				return invocation.proceed();

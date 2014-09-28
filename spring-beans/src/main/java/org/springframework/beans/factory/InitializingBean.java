@@ -35,6 +35,8 @@ package org.springframework.beans.factory;
 public interface InitializingBean {
 
 	/**
+     * 在BeanFactory设置完它所有属性之后调用afterPropertiesSet
+     *
 	 * Invoked by a BeanFactory after it has set all bean properties supplied
 	 * (and satisfied BeanFactoryAware and ApplicationContextAware).
 	 * <p>This method allows the bean instance to perform initialization only

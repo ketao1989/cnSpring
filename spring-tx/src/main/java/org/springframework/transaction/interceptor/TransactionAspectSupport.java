@@ -217,6 +217,8 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 	}
 
 	/**
+     * 检查事务管理必须要设置的元素。
+     *
 	 * Check that required properties were set.
 	 */
 	public void afterPropertiesSet() {
@@ -317,6 +319,7 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 	}
 
 	/**
+     * 对指定的事务使用指定的事务管理器。
 	 * Determine the specific transaction manager to use for the given transaction.
 	 */
 	protected PlatformTransactionManager determineTransactionManager(TransactionAttribute txAttr) {
