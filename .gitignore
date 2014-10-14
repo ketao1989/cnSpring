@@ -26,6 +26,7 @@ buildSrc/build
 
 # Eclipse artifacts, including WTP generated manifests
 .classpath
+.class
 .project
 spring-*/src/main/java/META-INF/MANIFEST.MF
 
