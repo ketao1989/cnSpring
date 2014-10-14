@@ -20,29 +20,20 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.Aware;
 
 /**
- * Interface to be implemented by any object that wishes to be notified
- * of the {@link ApplicationContext} that it runs in.
+ * 一个接口，任务对象想要自己在ApplicationContext中运行，都可以去实现该接口。
  *
- * <p>Implementing this interface makes sense for example when an object
- * requires access to a set of collaborating beans. Note that configuration
- * via bean references is preferable to implementing this interface just
- * for bean lookup purposes.
+ * 实现该接口，比如，你想要一个对象访问一系列合作的beans。但是需要注意，通过在配置中使用bean引用由于通过该接口实现
+ * bean查找目的。
  *
- * <p>This interface can also be implemented if an object needs access to file
- * resources, i.e. wants to call {@code getResource}, wants to publish
- * an application event, or requires access to the MessageSource. However,
- * it is preferable to implement the more specific {@link ResourceLoaderAware},
- * {@link ApplicationEventPublisherAware} or {@link MessageSourceAware} interface
- * in such a specific scenario.
+ * 这个接口也可以被一个需要访问文件资源的对象。比如，想要调用{@code getResource}，想要发布application 事件，或者需要访问
+ * MessageSource。尽管如此，它还是更喜欢去实现更特定的接口，比如特定场景的{@link ResourceLoaderAware},
+ * {@link ApplicationEventPublisherAware} 或者 {@link MessageSourceAware}。
  *
- * <p>Note that file resource dependencies can also be exposed as bean properties
- * of type {@link org.springframework.core.io.Resource}, populated via Strings
- * with automatic type conversion by the bean factory. This removes the need
- * for implementing any callback interface just for the purpose of accessing
- * a specific file resource.
+ * 注意，文件资源依赖也可以作为{@link org.springframework.core.io.Resource}类型的bean properties暴露出来，
+ * 自动地通过字符串类型转化为bean，通过bean工厂方法。这移除了为了仅仅访问指定文件资源的目的而去实现任务回调接口的需求。
  *
- * <p>{@link org.springframework.context.support.ApplicationObjectSupport} is a
- * convenience base class for application objects, implementing this interface.
+ * {@link org.springframework.context.support.ApplicationObjectSupport}是这个接口的方便的实现基类。
+ *
  *
  * <p>For a list of all bean lifecycle methods, see the
  * {@link org.springframework.beans.factory.BeanFactory BeanFactory javadocs}.
