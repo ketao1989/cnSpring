@@ -21,6 +21,12 @@ import org.w3c.dom.Element;
 import org.springframework.beans.factory.config.BeanDefinition;
 
 /**
+ * DefaultBeanDefinitionDocumentReader使用的接口，来处理自定义，高级别（{@code <beans/>}下面一级的，
+ * 例如“<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" /></beans>”）的标签.
+ *
+ * 该parser 从关联的NamespaceHandler 中为自定义标签 找出一个 BeanDefinitionParser。
+ *
+ *
  * Interface used by the {@link DefaultBeanDefinitionDocumentReader} to handle custom,
  * top-level (directly under {@code <beans/>}) tags.
  *
@@ -38,6 +44,11 @@ import org.springframework.beans.factory.config.BeanDefinition;
 public interface BeanDefinitionParser {
 
 	/**
+     * 解析指定的元素，然后注册相应的结果，该结果是嵌入到ParserContext的带有
+     * 【ParserContext#getRegistry() BeanDefinitionRegistry】的BeanDefinition。
+     *
+     * 因此从方法最后必须返回主要的BeanDefinition对象。
+     *
 	 * Parse the specified {@link Element} and register the resulting
 	 * {@link BeanDefinition BeanDefinition(s)} with the
 	 * {@link org.springframework.beans.factory.xml.ParserContext#getRegistry() BeanDefinitionRegistry}

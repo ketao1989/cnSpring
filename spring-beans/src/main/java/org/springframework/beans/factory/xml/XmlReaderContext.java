@@ -26,6 +26,9 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
 /**
+ * 扩展了ReadContext类，指定使用XmlBeanDefinitionReader。
+ * 提供访问在XmlBeanDefinitionReader配置的NamespaceHandlerResolver。
+ *
  * Extension of {@link org.springframework.beans.factory.parsing.ReaderContext},
  * specific to use with an {@link XmlBeanDefinitionReader}. Provides access to the
  * {@link NamespaceHandlerResolver} configured in the {@link XmlBeanDefinitionReader}.
