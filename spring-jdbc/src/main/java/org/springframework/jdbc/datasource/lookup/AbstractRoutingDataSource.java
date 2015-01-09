@@ -27,6 +27,9 @@ import org.springframework.jdbc.datasource.AbstractDataSource;
 import org.springframework.util.Assert;
 
 /**
+ * 抽象的javax.sql.DataSource实现，可以完成基于一个查找key来路由 #getConnection()到某些特性目标DataSourcesd的一个。
+ * 一般通过绑定线程事务上下文来决定。
+ *
  * Abstract {@link javax.sql.DataSource} implementation that routes {@link #getConnection()}
  * calls to one of various target DataSources based on a lookup key. The latter is usually
  * (but not necessarily) determined through some thread-bound transaction context.
@@ -53,20 +56,20 @@ public abstract class AbstractRoutingDataSource extends AbstractDataSource imple
 
 
 	/**
-	 * Specify the map of target DataSources, with the lookup key as key.
-	 * The mapped value can either be a corresponding {@link javax.sql.DataSource}
-	 * instance or a data source name String (to be resolved via a
-	 * {@link #setDataSourceLookup DataSourceLookup}).
-	 * <p>The key can be of arbitrary type; this class implements the
-	 * generic lookup process only. The concrete key representation will
-	 * be handled by {@link #resolveSpecifiedLookupKey(Object)} and
-	 * {@link #determineCurrentLookupKey()}.
+     * 设置目标DataSources的map映射，其中查找key作为 map的key。
+     * 这个映射的value可以是对象的DataSource实例，或者是一个数据源 name的字符串（可以被DataSourceLookup解析）。
+     *
+     * key可以是任意的类型，只要实现了普通的查找处理。
+     * 具体的key表示形式，将会被resolveSpecifiedLookupKey和determineCurrentLookupKey处理
+     *
 	 */
 	public void setTargetDataSources(Map<Object, Object> targetDataSources) {
 		this.targetDataSources = targetDataSources;
 	}
 
 	/**
+     * 设置默认目标数据源。
+     *
 	 * Specify the default target DataSource, if any.
 	 * <p>The mapped value can either be a corresponding {@link javax.sql.DataSource}
 	 * instance or a data source name String (to be resolved via a
@@ -80,6 +83,9 @@ public abstract class AbstractRoutingDataSource extends AbstractDataSource imple
 	}
 
 	/**
+     * 指定默认的DataSource，当通过指定的查找key不能找到对应的DataSource。
+     * 如果为false，则直接返回失败，如果为true，则使用默认的数据源。默认为true
+     *
 	 * Specify whether to apply a lenient fallback to the default DataSource
 	 * if no specific DataSource could be found for the current lookup key.
 	 * <p>Default is "true", accepting lookup keys without a corresponding entry
