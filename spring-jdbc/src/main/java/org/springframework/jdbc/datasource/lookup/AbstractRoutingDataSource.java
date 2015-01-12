@@ -30,15 +30,6 @@ import org.springframework.util.Assert;
  * 抽象的javax.sql.DataSource实现，可以完成基于一个查找key来路由 #getConnection()到某些特性目标DataSourcesd的一个。
  * 一般通过绑定线程事务上下文来决定。
  *
- * Abstract {@link javax.sql.DataSource} implementation that routes {@link #getConnection()}
- * calls to one of various target DataSources based on a lookup key. The latter is usually
- * (but not necessarily) determined through some thread-bound transaction context.
- *
- * @author Juergen Hoeller
- * @since 2.0.1
- * @see #setTargetDataSources
- * @see #setDefaultTargetDataSource
- * @see #determineCurrentLookupKey()
  */
 public abstract class AbstractRoutingDataSource extends AbstractDataSource implements InitializingBean {
 
@@ -68,15 +59,7 @@ public abstract class AbstractRoutingDataSource extends AbstractDataSource imple
 	}
 
 	/**
-     * 设置默认目标数据源。
-     *
-	 * Specify the default target DataSource, if any.
-	 * <p>The mapped value can either be a corresponding {@link javax.sql.DataSource}
-	 * instance or a data source name String (to be resolved via a
-	 * {@link #setDataSourceLookup DataSourceLookup}).
-	 * <p>This DataSource will be used as target if none of the keyed
-	 * {@link #setTargetDataSources targetDataSources} match the
-	 * {@link #determineCurrentLookupKey()} current lookup key.
+     * 设置默认目标数据源。如果我们在map中找不到对应的key时，则会使用这里设置的默认数据源
 	 */
 	public void setDefaultTargetDataSource(Object defaultTargetDataSource) {
 		this.defaultTargetDataSource = defaultTargetDataSource;
@@ -85,28 +68,15 @@ public abstract class AbstractRoutingDataSource extends AbstractDataSource imple
 	/**
      * 指定默认的DataSource，当通过指定的查找key不能找到对应的DataSource。
      * 如果为false，则直接返回失败，如果为true，则使用默认的数据源。默认为true
-     *
-	 * Specify whether to apply a lenient fallback to the default DataSource
-	 * if no specific DataSource could be found for the current lookup key.
-	 * <p>Default is "true", accepting lookup keys without a corresponding entry
-	 * in the target DataSource map - simply falling back to the default DataSource
-	 * in that case.
-	 * <p>Switch this flag to "false" if you would prefer the fallback to only apply
-	 * if the lookup key was {@code null}. Lookup keys without a DataSource
-	 * entry will then lead to an IllegalStateException.
-	 * @see #setTargetDataSources
-	 * @see #setDefaultTargetDataSource
-	 * @see #determineCurrentLookupKey()
 	 */
 	public void setLenientFallback(boolean lenientFallback) {
 		this.lenientFallback = lenientFallback;
 	}
 
 	/**
-	 * Set the DataSourceLookup implementation to use for resolving data source
-	 * name Strings in the {@link #setTargetDataSources targetDataSources} map.
-	 * <p>Default is a {@link JndiDataSourceLookup}, allowing the JNDI names
-	 * of application server DataSources to be specified directly.
+     * 设置DataSourceLookup的实现类，该实现类可以把字符串配置的数据源，解析成我们需要的DataSource类.默认使用JndiDataSourceLookup。
+     *
+     * JndiDataSourceLookup方法使用ref bean方式获取配置文件中配置的dataSource数据源，也就是我们一般使用xml中配置datasource的方式就是jndi。
 	 */
 	public void setDataSourceLookup(DataSourceLookup dataSourceLookup) {
 		this.dataSourceLookup = (dataSourceLookup != null ? dataSourceLookup : new JndiDataSourceLookup());
@@ -129,13 +99,7 @@ public abstract class AbstractRoutingDataSource extends AbstractDataSource imple
 	}
 
 	/**
-	 * Resolve the given lookup key object, as specified in the
-	 * {@link #setTargetDataSources targetDataSources} map, into
-	 * the actual lookup key to be used for matching with the
-	 * {@link #determineCurrentLookupKey() current lookup key}.
-	 * <p>The default implementation simply returns the given key as-is.
-	 * @param lookupKey the lookup key object as specified by the user
-	 * @return the lookup key as needed for matching
+	 * 根据lookupKey获取map中存放的key值，一般无特性情况，两者是一样的
 	 */
 	protected Object resolveSpecifiedLookupKey(Object lookupKey) {
 		return lookupKey;
