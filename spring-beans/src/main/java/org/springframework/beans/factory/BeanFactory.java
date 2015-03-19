@@ -19,6 +19,20 @@ package org.springframework.beans.factory;
 import org.springframework.beans.BeansException;
 
 /**
+ * 访问Spring bean容器的根接口。这是一个bean容器的基础client视图；更详细的接口，比如 {@link ListableBeanFactory}
+ * 和{@link org.springframework.beans.factory.config.ConfigurableBeanFactory}，可以在特定场合使用。
+ *
+ * 这个接口一般被拥有许多bean definition，根据名称唯一标识的对象实现。
+ *
+ * 依赖bean definition，factory将要么返回包含对象的独立实例（Prototype 原型设计模式），要么返回单个共享实例（Singleton 单例设计模式）。
+ * 这些实例的类型，依赖于 bean factory的配置，即使API是相同的。Since Spring
+ * 2.0, further scopes are available depending on the concrete application
+ * context (e.g. "request" and "session" scopes in a web environment)
+ *
+ * BeanFactory 的核心是应用组件的中心注册，以及应用组件的集中配置（不用单独去解析个别的配置文件）。
+ *
+ * 通常一个BeanFactory 加载存储在
+ *
  * The root interface for accessing a Spring bean container.
  * This is the basic client view of a bean container;
  * further interfaces such as {@link ListableBeanFactory} and

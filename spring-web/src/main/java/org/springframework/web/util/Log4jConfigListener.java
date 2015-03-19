@@ -20,6 +20,10 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 /**
+ * 启动的监听器，在web环境里常用的log4j初始化工作，主要代理 Log4jWebConfigurer 功能。
+ *
+ * 主要是，不重启服务，更换log的级别
+ *
  * Bootstrap listener for custom log4j initialization in a web environment.
  * Delegates to {@link Log4jWebConfigurer} (see its javadoc for configuration details).
  *
