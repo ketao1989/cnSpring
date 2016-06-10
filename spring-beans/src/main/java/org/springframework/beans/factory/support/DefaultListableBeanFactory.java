@@ -660,6 +660,8 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			}
 		}
 
+		// 构造一个 <name,beanDefinition> 的 concurrentMap,包含所有需要构建的对象数据结构信息
+		// beanDefinitionNames 包含所有的name 列表
 		synchronized (this.beanDefinitionMap) {
 			Object oldBeanDefinition = this.beanDefinitionMap.get(beanName);
 			if (oldBeanDefinition != null) {
@@ -682,6 +684,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			this.beanDefinitionMap.put(beanName, beanDefinition);
 		}
 
+		// 更新所有涉及bean definition 信息的变量
 		resetBeanDefinition(beanName);
 	}
 
@@ -715,6 +718,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		// Remove corresponding bean from singleton cache, if any. Shouldn't usually
 		// be necessary, rather just meant for overriding a context's default beans
 		// (e.g. the default StaticMessageSource in a StaticApplicationContext).
+		// 当允许覆盖已有bean的时候,则需要将已构造好的bean单例销毁掉
 		destroySingleton(beanName);
 
 		// Remove any assumptions about by-type mappings.

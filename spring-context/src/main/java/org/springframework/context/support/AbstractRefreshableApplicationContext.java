@@ -134,6 +134,8 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 			DefaultListableBeanFactory beanFactory = createBeanFactory();
 			beanFactory.setSerializationId(getId());
 			customizeBeanFactory(beanFactory);
+
+			// 注册bean definition 到map容器中,第三步
 			loadBeanDefinitions(beanFactory);
 			synchronized (this.beanFactoryMonitor) {
 				this.beanFactory = beanFactory;
@@ -185,6 +187,7 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 
 	/**
 	 * 为该 applicationContext 创建一个内部的bean factory.每次调用refresh 都会去尝试创建,默认创建DefaultListableBeanFactory
+	 * 一般情况下,parent 为 null
 	 *
 	 * Create an internal bean factory for this context.
 	 * Called for each {@link #refresh()} attempt.

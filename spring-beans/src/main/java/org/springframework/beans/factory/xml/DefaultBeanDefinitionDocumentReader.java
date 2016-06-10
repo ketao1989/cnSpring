@@ -104,6 +104,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		this.readerContext = readerContext;
 		logger.debug("Loading bean definitions");
 		Element root = doc.getDocumentElement();
+		// 拿到root元素,只解析spring-beans的标签元素
 		doRegisterBeanDefinitions(root);
 	}
 
@@ -117,7 +118,10 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	 * @see #setEnvironment
 	 */
 	protected void doRegisterBeanDefinitions(Element root) {
+
+		// 获取profile,一般不设置
 		String profileSpec = root.getAttribute(PROFILE_ATTRIBUTE);
+
 		if (StringUtils.hasText(profileSpec)) {
 			Assert.state(this.environment != null, "Environment must be set for evaluating profiles");
 			String[] specifiedProfiles = StringUtils.tokenizeToStringArray(
@@ -136,9 +140,11 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		BeanDefinitionParserDelegate parent = this.delegate;
 		this.delegate = createDelegate(this.readerContext, root, parent);
 
-		preProcessXml(root);
+		preProcessXml(root);// 空实现
+
+		// 这里实际上是调用delegate 来处理ele元素
 		parseBeanDefinitions(root, this.delegate);
-		postProcessXml(root);
+		postProcessXml(root);// 空实现
 
 		this.delegate = parent;
 	}
@@ -185,6 +191,8 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	 * @param root the DOM root element of the document
 	 */
 	protected void parseBeanDefinitions(Element root, BeanDefinitionParserDelegate delegate) {
+
+		// 对root下面的每一个元素进行处理解析,注册到register上
 		if (delegate.isDefaultNamespace(root)) {
 			NodeList nl = root.getChildNodes();
 			for (int i = 0; i < nl.getLength(); i++) {
@@ -212,9 +220,11 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		else if (delegate.nodeNameEquals(ele, ALIAS_ELEMENT)) {
 			processAliasRegistration(ele);
 		}
+		// 处理bean元素
 		else if (delegate.nodeNameEquals(ele, BEAN_ELEMENT)) {
 			processBeanDefinition(ele, delegate);
 		}
+		// beans 处理,则回到调用的方法去循环解析处理
 		else if (delegate.nodeNameEquals(ele, NESTED_BEANS_ELEMENT)) {
 			// recurse
 			doRegisterBeanDefinitions(ele);
@@ -318,15 +328,24 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	}
 
 	/**
+	 * 处理给定的bean element ,分析bean definition,然后注册到容器上.
+	 *
+	 * 得到了 documentReader 以后,为具体的spring bean的解析过程准备好数据.这里具体处理bean definition
+	 * 的逻辑委托给BeanDefinitionParserDelegate完成,ele对应xml的某个bean元素
+	 *
 	 * Process the given bean element, parsing the bean definition
 	 * and registering it with the registry.
 	 */
 	protected void processBeanDefinition(Element ele, BeanDefinitionParserDelegate delegate) {
+
+		// BeanDefinitionHolder 是对BeanDefinition的封装,里面有BeanDefinition,bean name和alias,
+		// 这样就可以向ioc容器注册.
 		BeanDefinitionHolder bdHolder = delegate.parseBeanDefinitionElement(ele);
 		if (bdHolder != null) {
 			bdHolder = delegate.decorateBeanDefinitionIfRequired(ele, bdHolder);
 			try {
-				// Register the final decorated instance.
+				// 对元素解析完了之后,将解析之后的BeanDefinitionHolder 注册到context的BeanDefinitionRegistry 上
+				// 实际上,最终调用beanfactory 的注册服务接口
 				BeanDefinitionReaderUtils.registerBeanDefinition(bdHolder, getReaderContext().getRegistry());
 			}
 			catch (BeanDefinitionStoreException ex) {
@@ -334,6 +353,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 						bdHolder.getBeanName() + "'", ele, ex);
 			}
 			// Send registration event.
+			// 触发注册事件
 			getReaderContext().fireComponentRegistered(new BeanComponentDefinition(bdHolder));
 		}
 	}
