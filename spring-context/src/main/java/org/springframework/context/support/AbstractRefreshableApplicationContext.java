@@ -113,17 +113,24 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 
 
 	/**
+	 * 这段代码实际上使用bean factory 执行了context的refresh的beanDefinition加载工作.
+	 * 如果先前存在bean factory,则先关闭,然后初始化一个,来执行接下来的context的生命周期管理.
+	 *
 	 * This implementation performs an actual refresh of this context's underlying
 	 * bean factory, shutting down the previous bean factory (if any) and
 	 * initializing a fresh bean factory for the next phase of the context's lifecycle.
 	 */
 	@Override
 	protected final void refreshBeanFactory() throws BeansException {
+		// 如果存在factory,则销毁关闭该factory
 		if (hasBeanFactory()) {
+			// 从执行destroy操作可以看出ioc中构造的一些重要的数据结构,各种map和set
 			destroyBeans();
+			// 将bean factory 置为 null
 			closeBeanFactory();
 		}
 		try {
+			//创建beanfactory,第二步
 			DefaultListableBeanFactory beanFactory = createBeanFactory();
 			beanFactory.setSerializationId(getId());
 			customizeBeanFactory(beanFactory);
@@ -177,6 +184,8 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 
 
 	/**
+	 * 为该 applicationContext 创建一个内部的bean factory.每次调用refresh 都会去尝试创建,默认创建DefaultListableBeanFactory
+	 *
 	 * Create an internal bean factory for this context.
 	 * Called for each {@link #refresh()} attempt.
 	 * <p>The default implementation creates a

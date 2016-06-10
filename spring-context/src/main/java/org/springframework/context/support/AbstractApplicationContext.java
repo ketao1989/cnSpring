@@ -1212,6 +1212,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
+	 * 如果实现了ConfigurableApplicationContext则返回配置的双亲ioc,否则,直接返回本身的双亲ioc
+	 *
 	 * Return the internal bean factory of the parent context if it implements
 	 * ConfigurableApplicationContext; else, return the parent context itself.
 	 * @see org.springframework.context.ConfigurableApplicationContext#getBeanFactory

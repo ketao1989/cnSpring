@@ -143,6 +143,10 @@ public class FileSystemXmlApplicationContext extends AbstractXmlApplicationConte
 
 
 	/**
+	 * 这是一个模板设计模式的方法,父类中实现loadBeanDefinition的逻辑,具体获取资源的方式,则由具体子类实现.
+	 *
+	 * 由于这是通过fileSystem来加载资源的,所以最终创建一个FileSystemResource对象
+	 *
 	 * Resolve resource paths as file system paths.
 	 * <p>Note: Even if a given path starts with a slash, it will get
 	 * interpreted as relative to the current VM working directory.

@@ -32,6 +32,7 @@ package org.springframework.beans.factory;
 public interface HierarchicalBeanFactory extends BeanFactory {
 
 	/**
+	 * 获取双亲ioc容器,具备双亲管理功能
 	 * Return the parent bean factory, or {@code null} if there is none.
 	 */
 	BeanFactory getParentBeanFactory();

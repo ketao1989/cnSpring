@@ -181,6 +181,10 @@ public abstract class AbstractBeanDefinitionReader implements EnvironmentCapable
 	}
 
 	/**
+	 * 通过指定的资源位置来加载 bean definitions.支持模式规则匹配ResourcePatternResolver.
+	 *
+	 * 所以,把location 路径,解析成源路径.然后,在进行加载
+	 *
 	 * Load bean definitions from the specified resource location.
 	 * <p>The location can also be a location pattern, provided that the
 	 * ResourceLoader of this bean definition reader is a ResourcePatternResolver.
@@ -196,12 +200,16 @@ public abstract class AbstractBeanDefinitionReader implements EnvironmentCapable
 	 * @see #loadBeanDefinitions(org.springframework.core.io.Resource[])
 	 */
 	public int loadBeanDefinitions(String location, Set<Resource> actualResources) throws BeanDefinitionStoreException {
+
+		// fileSystem通过继承,使用默认的DefaultResourceLoader类定位资源
 		ResourceLoader resourceLoader = getResourceLoader();
 		if (resourceLoader == null) {
 			throw new BeanDefinitionStoreException(
 					"Cannot import bean definitions from location [" + location + "]: no ResourceLoader available");
 		}
 
+		// 使用classpath的支持这种模式匹配,因为文件范围是指定的;而直接使用filesystem的,则不行
+		// 默认使用 PathMatchingResourcePatternResolver 来解析模式规则,调用getResources获取resource[]结果
 		if (resourceLoader instanceof ResourcePatternResolver) {
 			// Resource pattern matching available.
 			try {
@@ -224,6 +232,7 @@ public abstract class AbstractBeanDefinitionReader implements EnvironmentCapable
 		}
 		else {
 			// Can only load single resources by absolute URL.
+			// 单个资源文件,最后调用具体子类来获取resource资源
 			Resource resource = resourceLoader.getResource(location);
 			int loadCount = loadBeanDefinitions(resource);
 			if (actualResources != null) {

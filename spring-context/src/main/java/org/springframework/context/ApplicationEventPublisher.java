@@ -30,6 +30,8 @@ package org.springframework.context;
 public interface ApplicationEventPublisher {
 
 	/**
+	 * 通知注册在该应用的某个事件的所有监听器,事件可能是框架的事件或者是应用自定义的事件.
+	 *
 	 * Notify all listeners registered with this application of an application
 	 * event. Events may be framework events (such as RequestHandledEvent)
 	 * or application-specific events.

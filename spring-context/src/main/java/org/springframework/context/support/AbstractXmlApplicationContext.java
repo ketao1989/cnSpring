@@ -16,14 +16,14 @@
 
 package org.springframework.context.support;
 
-import java.io.IOException;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.ResourceEntityResolver;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.Resource;
+
+import java.io.IOException;
 
 /**
  * Convenient base class for {@link org.springframework.context.ApplicationContext}
@@ -71,6 +71,10 @@ public abstract class AbstractXmlApplicationContext extends AbstractRefreshableC
 
 
 	/**
+	 * 通过XmlBeanDefinitionReader 来加载bean definition.第三步.
+	 *
+	 * 当然,可能存在其他非xml形式的配置加载,所以这个从refreshablApplicationConetext类中抽象出模板方法,在子类来实现
+	 *
 	 * Loads the bean definitions via an XmlBeanDefinitionReader.
 	 * @see org.springframework.beans.factory.xml.XmlBeanDefinitionReader
 	 * @see #initBeanDefinitionReader
@@ -78,18 +82,26 @@ public abstract class AbstractXmlApplicationContext extends AbstractRefreshableC
 	 */
 	@Override
 	protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws BeansException, IOException {
+
 		// Create a new XmlBeanDefinitionReader for the given BeanFactory.
+		// DefaultListableBeanFactory 中实现了BeanDefinitionRegistry ,reader会将解析好的bean definition 注册到该对象上
 		XmlBeanDefinitionReader beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
 
 		// Configure the bean definition reader with this context's
 		// resource loading environment.
+		// 配置资源使用的环境,一般用的比较少,打包一般只配置对应的环境配置
 		beanDefinitionReader.setEnvironment(this.getEnvironment());
+
+		// this 继承了 DefaultResourceLoader类,所以其如果不是classpath的话,最终会调用filesystem的getResourcebypath
 		beanDefinitionReader.setResourceLoader(this);
+
 		beanDefinitionReader.setEntityResolver(new ResourceEntityResolver(this));
 
 		// Allow a subclass to provide custom initialization of the reader,
 		// then proceed with actually loading the bean definitions.
+		// 允许子类提供自定义的reader初始化,然后进行实际的加载bean definition工作
 		initBeanDefinitionReader(beanDefinitionReader);
+
 		loadBeanDefinitions(beanDefinitionReader);
 	}
 
@@ -122,6 +134,8 @@ public abstract class AbstractXmlApplicationContext extends AbstractRefreshableC
 		if (configResources != null) {
 			reader.loadBeanDefinitions(configResources);
 		}
+
+		// filesystem 在初始化的时候,setLocation为文件的路径名,通过继承AbstractRefreshableConfigApplicationContext#set方法
 		String[] configLocations = getConfigLocations();
 		if (configLocations != null) {
 			reader.loadBeanDefinitions(configLocations);
