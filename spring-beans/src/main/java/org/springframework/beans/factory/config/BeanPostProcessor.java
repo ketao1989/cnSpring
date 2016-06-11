@@ -19,10 +19,16 @@ package org.springframework.beans.factory.config;
 import org.springframework.beans.BeansException;
 
 /**
- * factory 钩子,允许对新bean实例进行自定义修改,比如检查接口
+ * factory 钩子,允许对新bean实例进行自定义修改,比如检查接口.
+ * 如果该接口的某个实现类注册到了bean factory中,则该beanFactory上的所有bean在初始化时都会调用该实现类的具体方法
  *
- * Factory hook that allows for custom modification of new bean instances,
- * e.g. checking for marker interfaces or wrapping them with proxies.
+ * ApplicationContexts 可以自动检测出在bean definitions中的BeanPostProcessor bean.
+ *
+ * 一般地,post-processors 可以在实例化之前调用postProcessBeforeInitialization方法,在实例化之后,通过代理的方式执行
+ * postProcessAfterInitialization方法.
+ *
+ * 假如我们使用了多个的BeanPostProcessor的实现类，那么如何确定处理顺序呢？
+ * 其实只要实现Ordered接口，设置order属性就可以很轻松的确定不同实现类的处理顺序了.
  *
  * <p>ApplicationContexts can autodetect BeanPostProcessor beans in their
  * bean definitions and apply them to any beans subsequently created.
@@ -44,6 +50,9 @@ import org.springframework.beans.BeansException;
 public interface BeanPostProcessor {
 
 	/**
+	 * 在任何bean实例回调(afterPropertiesSet方法或者init-method方法)之前.这个返回的bean可能返回原来的那个
+	 * 或者,返回封装后的一个.比如AOP相关,可以通过这个来完成代理.
+	 *
 	 * Apply this BeanPostProcessor to the given new bean instance <i>before</i> any bean
 	 * initialization callbacks (like InitializingBean's {@code afterPropertiesSet}
 	 * or a custom init-method). The bean will already be populated with property values.

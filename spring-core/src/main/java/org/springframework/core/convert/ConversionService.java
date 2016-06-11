@@ -17,6 +17,8 @@
 package org.springframework.core.convert;
 
 /**
+ * 提供类型转换的服务接口,提供现成安全的类型转换
+ *
  * A service interface for type conversion. This is the entry point into the convert system.
  * Call {@link #convert(Object, Class)} to perform a thread-safe type conversion using this system.
  *

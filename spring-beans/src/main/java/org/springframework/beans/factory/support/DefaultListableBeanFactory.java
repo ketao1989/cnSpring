@@ -257,6 +257,9 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	// Implementation of ListableBeanFactory interface
 	//---------------------------------------------------------------------
 
+	/**
+	 * 根据指定的类型返回bean实例
+     */
 	public <T> T getBean(Class<T> requiredType) throws BeansException {
 		Assert.notNull(requiredType, "Required type must not be null");
 		String[] beanNames = getBeanNamesForType(requiredType);
@@ -264,13 +267,15 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			ArrayList<String> autowireCandidates = new ArrayList<String>();
 			for (String beanName : beanNames) {
 				if (getBeanDefinition(beanName).isAutowireCandidate()) {
-					autowireCandidates.add(beanName);
+					autowireCandidates.add(beanName);// 自动注入候选人
 				}
 			}
 			if (autowireCandidates.size() > 0) {
 				beanNames = autowireCandidates.toArray(new String[autowireCandidates.size()]);
 			}
 		}
+
+		// 正常情况下,只会有一个name,也就是这个逻辑分支,具体获取bean的逻辑
 		if (beanNames.length == 1) {
 			return getBean(beanNames[0], requiredType);
 		}
@@ -324,16 +329,22 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		return getBeanNamesForType(type, true, true);
 	}
 
+	/**
+	 * 根据类型获取bean name
+     */
 	public String[] getBeanNamesForType(Class<?> type, boolean includeNonSingletons, boolean allowEagerInit) {
 		if (!isConfigurationFrozen() || type == null || !allowEagerInit) {
 			return doGetBeanNamesForType(type, includeNonSingletons, allowEagerInit);
 		}
+
+		// 获取factory的所有注册的单例类型map
 		Map<Class<?>, String[]> cache =
 				(includeNonSingletons ? this.allBeanNamesByType : this.singletonBeanNamesByType);
 		String[] resolvedBeanNames = cache.get(type);
 		if (resolvedBeanNames != null) {
 			return resolvedBeanNames;
 		}
+		// 缓存中没有,则去所有bean definition names 中 查找
 		resolvedBeanNames = doGetBeanNamesForType(type, includeNonSingletons, allowEagerInit);
 		if (ClassUtils.isCacheSafe(type, getBeanClassLoader())) {
 			cache.put(type, resolvedBeanNames);
@@ -345,6 +356,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		List<String> result = new ArrayList<String>();
 
 		// Check all bean definitions.
+		// 获取所有注册了得bean definitions name 的列表
 		String[] beanDefinitionNames = getBeanDefinitionNames();
 		for (String beanName : beanDefinitionNames) {
 			// Only consider bean as eligible if the bean name
@@ -362,9 +374,10 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 								(includeNonSingletons || isSingleton(beanName)) && isTypeMatch(beanName, type);
 						if (!matchFound && isFactoryBean) {
 							// In case of FactoryBean, try to match FactoryBean instance itself next.
-							beanName = FACTORY_BEAN_PREFIX + beanName;
+							beanName = FACTORY_BEAN_PREFIX + beanName;// 加前缀&,beanFactory 对象和 factoryBean的区别
 							matchFound = (includeNonSingletons || mbd.isSingleton()) && isTypeMatch(beanName, type);
 						}
+						//类型匹配,则说明是type对应的注册在factory 上的 bean definition name
 						if (matchFound) {
 							result.add(beanName);
 						}
@@ -394,6 +407,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		}
 
 		// Check singletons too, to catch manually registered singletons.
+		// 对单例Singleton单例的名字集合,查找不到bean definition name列表的集合,主要处理FactoryBean的问题
 		String[] singletonNames = getSingletonNames();
 		for (String beanName : singletonNames) {
 			// Only check if manually registered.
