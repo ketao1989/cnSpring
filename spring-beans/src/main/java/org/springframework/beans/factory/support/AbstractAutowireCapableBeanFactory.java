@@ -486,14 +486,16 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// Instantiate the bean.
 		BeanWrapper instanceWrapper = null;
 
-		// 如果是单例模式,则表示可以直接从cache中尝试获取
+		// 如果是单例模式,则clear wrapper cache
 		if (mbd.isSingleton()) {
 			instanceWrapper = this.factoryBeanInstanceCache.remove(beanName);
 		}
 		if (instanceWrapper == null) {
-			// 如果cache 中不存在,则创建bean实例
+			// 如果cache 中不存在,则创建bean实例,简单地构造,不进行setter操作
 			instanceWrapper = createBeanInstance(beanName, mbd, args);
 		}
+
+		// instanceWrapper 和 bean 都只是个初始化对象,还没有setter
 		final Object bean = (instanceWrapper != null ? instanceWrapper.getWrappedInstance() : null);
 		Class<?> beanType = (instanceWrapper != null ? instanceWrapper.getWrappedClass() : null);
 
@@ -512,14 +514,17 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// 只是构建一个引用,setter的相关注入还未进行
 		boolean earlySingletonExposure = (mbd.isSingleton() && this.allowCircularReferences &&
 				isSingletonCurrentlyInCreation(beanName));
+
+		// todo 如果需要创建的bean name ,正在创建,则是循环引用的场景,需要特殊处理
 		if (earlySingletonExposure) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Eagerly caching bean '" + beanName +
 						"' to allow for resolving potential circular references");
 			}
-			// 按照正常的处理,放入objectFactory,然后从early中移除出来,最后获取的时候,再延迟加载
+			// 创建的时候,是从注册过得objectFactory构造bean
 			addSingletonFactory(beanName, new ObjectFactory<Object>() {
 				public Object getObject() throws BeansException {
+					// 如果实现接口,会进行增强处理
 					return getEarlyBeanReference(beanName, mbd, bean);
 				}
 			});
@@ -529,7 +534,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		Object exposedObject = bean;
 		try {
 
-			// 填充property value 的相关setter对象,完成依赖注入
+			// 填充property value 的相关setter对象,构建依赖的所有 bean name
 			populateBean(beanName, mbd, instanceWrapper);
 
 			if (exposedObject != null) {
@@ -547,15 +552,19 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		// 对于Early初始化的情况
+		// todo 如果需要创建的bean name ,正在创建,则是循环引用的场景,需要特殊处理
 		if (earlySingletonExposure) {
 
 			// 这里是实际构造early bean的地方,所以获取的时候,不在允许early模式
 			Object earlySingletonReference = getSingleton(beanName, false);
 			if (earlySingletonReference != null) {
+
+				// 如果两个bean相同,则
 				if (exposedObject == bean) {
 					exposedObject = earlySingletonReference;
 				}
 				else if (!this.allowRawInjectionDespiteWrapping && hasDependentBean(beanName)) {
+
 					String[] dependentBeans = getDependentBeans(beanName);
 					Set<String> actualDependentBeans = new LinkedHashSet<String>(dependentBeans.length);
 					for (String dependentBean : dependentBeans) {
@@ -781,6 +790,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 */
 	protected Object getEarlyBeanReference(String beanName, RootBeanDefinition mbd, Object bean) {
 		Object exposedObject = bean;
+
+		// 判断,hasInstantiationAwareBeanPostProcessors 判断是否增强了实现BeanPostProcessor,特殊处理
 		if (bean != null && !mbd.isSynthetic() && hasInstantiationAwareBeanPostProcessors()) {
 			for (BeanPostProcessor bp : getBeanPostProcessors()) {
 				if (bp instanceof SmartInstantiationAwareBeanPostProcessor) {
@@ -1104,7 +1115,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
-	 * 填充.在指定的BeanWrapper里填充指定的bean实例,和在bean definition 中设置的 property values
+	 * 填充.在指定的BeanWrapper里填充指定的bean name,和在bean definition 中设置的 property values
 	 *
 	 * Populate the bean instance in the given BeanWrapper with the property values
 	 * from the bean definition.
@@ -1207,11 +1218,14 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	protected void autowireByName(
 			String beanName, AbstractBeanDefinition mbd, BeanWrapper bw, MutablePropertyValues pvs) {
 
+		// 从mdb中找出所有property的ref name列表
 		String[] propertyNames = unsatisfiedNonSimpleProperties(mbd, bw);
 		for (String propertyName : propertyNames) {
 			if (containsBean(propertyName)) {
 				Object bean = getBean(propertyName);// 触发下一个getBean操作
 				pvs.add(propertyName, bean);
+
+				// 将依赖的bean关联到beanName上等操作
 				registerDependentBean(propertyName, beanName);
 				if (logger.isDebugEnabled()) {
 					logger.debug("Added autowiring by name from bean name '" + beanName +

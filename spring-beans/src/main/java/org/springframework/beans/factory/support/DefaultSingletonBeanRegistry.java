@@ -83,9 +83,15 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	private final Map<String, Object> singletonObjects = new ConcurrentHashMap<String, Object>(64);
 
 	/** Cache of singleton factories: bean name --> ObjectFactory */
+	/**
+	 * 用于存储在spring内部所使用的beanName->对象工厂的引用，一旦最终对象被创建(通过objectFactory.getObject())，此引用信息将删除
+	 */
 	private final Map<String, ObjectFactory<?>> singletonFactories = new HashMap<String, ObjectFactory<?>>(16);
 
 	/** Cache of early singleton objects: bean name --> bean instance */
+	/**
+	 * 用于存储在创建Bean早期对创建的原始bean的一个引用，注意这里是原始bean，即使用工厂方法或构造方法创建出来的对象，一旦对象最终创建好，此引用信息将删除
+	 */
 	private final Map<String, Object> earlySingletonObjects = new HashMap<String, Object>(16);
 
 	/** Set of registered singletons, containing the bean names in registration order */
@@ -146,6 +152,8 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	}
 
 	/**
+	 * 在构建单例bean的时候,增加新的单例factory,并且把该beanName 从earlySingletonObjects移除开
+	 *
 	 * Add the given singleton factory for building the specified singleton
 	 * if necessary.
 	 * <p>To be called for eager registration of singletons, e.g. to be able to
@@ -180,11 +188,14 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * @return the registered singleton object, or {@code null} if none found
 	 */
 	protected Object getSingleton(String beanName, boolean allowEarlyReference) {
+
 		Object singletonObject = this.singletonObjects.get(beanName);
+
 		if (singletonObject == null && isSingletonCurrentlyInCreation(beanName)) {
 			synchronized (this.singletonObjects) {
 				singletonObject = this.earlySingletonObjects.get(beanName);
 				// 如果连earlySingletonObjects都不存在,则构造early bean 对象
+				// 第一次getSingleton的时候,allowEarlyReference为true,所以第二次从earlySingletonObjects有数据
 				if (singletonObject == null && allowEarlyReference) {
 					ObjectFactory<?> singletonFactory = this.singletonFactories.get(beanName);
 					if (singletonFactory != null) {
@@ -199,6 +210,8 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	}
 
 	/**
+	 * 这里已经注册了得指定bean name的单例对象,如果没有创建过,则创建一个
+	 *
 	 * Return the (raw) singleton object registered under the given name,
 	 * creating and registering a new one if none registered yet.
 	 * @param beanName the name of the bean
@@ -219,12 +232,14 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 				if (logger.isDebugEnabled()) {
 					logger.debug("Creating shared instance of singleton bean '" + beanName + "'");
 				}
+				// 在创建单例之前,一些预处理检查工作,设置正在创建属性,加入列表
 				beforeSingletonCreation(beanName);
 				boolean recordSuppressedExceptions = (this.suppressedExceptions == null);
 				if (recordSuppressedExceptions) {
 					this.suppressedExceptions = new LinkedHashSet<Exception>();
 				}
 				try {
+					// 实例化对象
 					singletonObject = singletonFactory.getObject();
 				}
 				catch (BeanCreationException ex) {
@@ -239,6 +254,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					if (recordSuppressedExceptions) {
 						this.suppressedExceptions = null;
 					}
+					// 创建完之后,做一些检查和清理工作
 					afterSingletonCreation(beanName);
 				}
 				addSingleton(beanName, singletonObject);
@@ -312,6 +328,8 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	}
 
 	/**
+	 * 返回当前要创建的beanName 是否还在创建中....提供给循环引用判断使用
+	 *
 	 * Return whether the specified singleton bean is currently in creation
 	 * (within the entire factory).
 	 * @param beanName the name of the bean
@@ -321,6 +339,8 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	}
 
 	/**
+	 * 在创建bean之前执行,会将beanName 放入正在创建bean的列表中,状态为True
+	 *
 	 * Callback before singleton creation.
 	 * <p>Default implementation register the singleton as currently in creation.
 	 * @param beanName the name of the singleton about to be created
@@ -334,6 +354,8 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	}
 
 	/**
+	 * 创建完成之后,将beanName 从正在创建的列表中移除
+	 *
 	 * Callback after singleton creation.
 	 * <p>The default implementation marks the singleton as not in creation anymore.
 	 * @param beanName the name of the singleton that has been created
