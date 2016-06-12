@@ -16,15 +16,6 @@
 
 package org.springframework.beans.factory.support;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.TypeConverter;
@@ -40,6 +31,15 @@ import org.springframework.beans.factory.config.TypedStringValue;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 
 /**
  * Helper class for use in bean factory implementations,
@@ -83,7 +83,9 @@ class BeanDefinitionValueResolver {
 
 
 	/**
-	 * Given a PropertyValue, return a value, resolving any references to other
+	 * 给定valueResolver,返回value,解析任何一个被引用的其他的bean.
+	 *
+	 * Given a valueResolver, return a value, resolving any references to other
 	 * beans in the factory if necessary. The value could be:
 	 * <li>A BeanDefinition, which leads to the creation of a corresponding
 	 * new bean instance. Singleton flags and names of such "inner beans"
@@ -309,6 +311,7 @@ class BeanDefinitionValueResolver {
 	}
 
 	/**
+	 * todo 通过前面解析到的bean definitions的信息,来获取setter的ref属性值
 	 * Resolve a reference to another bean in the factory.
 	 */
 	private Object resolveReference(Object argName, RuntimeBeanReference ref) {
@@ -325,6 +328,7 @@ class BeanDefinitionValueResolver {
 				return this.beanFactory.getParentBeanFactory().getBean(refName);
 			}
 			else {
+				// 从bean factory 中获取bean,然后注册到依赖中
 				Object bean = this.beanFactory.getBean(refName);
 				this.beanFactory.registerDependentBean(refName, this.beanName);
 				return bean;

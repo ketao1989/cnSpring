@@ -16,6 +16,18 @@
 
 package org.springframework.beans;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.core.CollectionFactory;
+import org.springframework.core.GenericCollectionTypeResolver;
+import org.springframework.core.convert.ConversionException;
+import org.springframework.core.convert.ConverterNotFoundException;
+import org.springframework.core.convert.Property;
+import org.springframework.core.convert.TypeDescriptor;
+import org.springframework.util.Assert;
+import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Array;
@@ -34,19 +46,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import org.springframework.core.CollectionFactory;
-import org.springframework.core.GenericCollectionTypeResolver;
-import org.springframework.core.convert.ConversionException;
-import org.springframework.core.convert.ConverterNotFoundException;
-import org.springframework.core.convert.Property;
-import org.springframework.core.convert.TypeDescriptor;
-import org.springframework.util.Assert;
-import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
 /**
  * Default {@link BeanWrapper} implementation that should be sufficient
@@ -880,6 +879,7 @@ public class BeanWrapperImpl extends AbstractPropertyAccessor implements BeanWra
 					"Nested property in path '" + propertyName + "' does not exist", ex);
 		}
 		PropertyTokenHolder tokens = getPropertyNameTokens(getFinalPath(nestedBw, propertyName));
+		// 设置相关属性到bean中
 		nestedBw.setPropertyValue(tokens, new PropertyValue(propertyName, value));
 	}
 
@@ -912,6 +912,7 @@ public class BeanWrapperImpl extends AbstractPropertyAccessor implements BeanWra
 		String propertyName = tokens.canonicalName;
 		String actualName = tokens.actualName;
 
+		// 集合类的注入
 		if (tokens.keys != null) {
 			// Apply indexes and map keys: fetch value for all keys but the last one.
 			PropertyTokenHolder getterTokens = new PropertyTokenHolder();
@@ -1028,6 +1029,7 @@ public class BeanWrapperImpl extends AbstractPropertyAccessor implements BeanWra
 			}
 		}
 
+		// 非集合类的注入
 		else {
 			PropertyDescriptor pd = pv.resolvedDescriptor;
 			if (pd == null || !pd.getWriteMethod().getDeclaringClass().isInstance(this.object)) {
@@ -1100,6 +1102,8 @@ public class BeanWrapperImpl extends AbstractPropertyAccessor implements BeanWra
 					}
 					pv.getOriginalPropertyValue().conversionNecessary = (valueToApply != originalValue);
 				}
+
+				// 下面通过反射方式,将setter的变量注入进去
 				final Method writeMethod = (pd instanceof GenericTypeAwarePropertyDescriptor ?
 						((GenericTypeAwarePropertyDescriptor) pd).getWriteMethodForActualAccess() :
 						pd.getWriteMethod());
