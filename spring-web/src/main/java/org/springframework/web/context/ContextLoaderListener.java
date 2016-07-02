@@ -19,7 +19,10 @@ import javax.servlet.ServletContextListener;
  * 
  * 在Spring 3.1 之后，ContextLoaderListener 支持通过构造函数ContextLoaderListener(WebApplicationContext) 注入根web应用上下文， 允许在 Servlet
  * 3.0+ 环境里 通过程序编码配置。
- * 
+ *
+ * TODO 所以,在spring 3.1 之后,如果是默认的ContextLoaderListener的话,则可以不在web.xml中配置listener,在dispatch中,会通过servletContext.addListener来
+ * TODO 设置这个变量到servlet上下文中.
+ *
  * Bootstrap listener to start up and shut down Spring's root {@link WebApplicationContext}. Simply delegates to
  * {@link ContextLoader} as well as to {@link ContextCleanupListener}.
  * 

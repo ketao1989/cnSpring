@@ -16,15 +16,6 @@
 
 package org.springframework.web.servlet.support;
 
-import java.util.EnumSet;
-import javax.servlet.DispatcherType;
-import javax.servlet.Filter;
-import javax.servlet.FilterRegistration;
-import javax.servlet.FilterRegistration.Dynamic;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRegistration;
-
 import org.springframework.core.Conventions;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
@@ -32,7 +23,22 @@ import org.springframework.web.context.AbstractContextLoaderInitializer;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
 
+import javax.servlet.DispatcherType;
+import javax.servlet.Filter;
+import javax.servlet.FilterRegistration;
+import javax.servlet.FilterRegistration.Dynamic;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRegistration;
+import java.util.EnumSet;
+
 /**
+ * 实现WebApplicationInitializer接口的基类,以用来在servlet context上注册一个DispatcherServlet.
+ *
+ * 继承的子类要求必须实现createServletApplicationContext 和 getServletMappings 方法,这两个方法都是提供
+ * 给registerDispatcherServlet调用,更多自定义的功能可以通过customizeRegistration(ServletRegistration.Dynamic)
+ * 实现来完成.
+ *
  * Base class for {@link org.springframework.web.WebApplicationInitializer}
  * implementations that register a {@link DispatcherServlet} in the servlet context.
  *

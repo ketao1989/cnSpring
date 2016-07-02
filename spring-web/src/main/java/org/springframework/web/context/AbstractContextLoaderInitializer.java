@@ -25,6 +25,9 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.web.WebApplicationInitializer;
 
 /**
+ * 为在servlet 上下文中注册一个WebApplicationInitializer接口的实现类提供基础抽象类.这个类只要求子类实现
+ * createRootApplicationContext方法,以便于registerContextLoaderListener方法调用.
+ *
  * Convenient base class for {@link WebApplicationInitializer} implementations
  * that register a {@link ContextLoaderListener} in the servlet context.
  *
@@ -55,6 +58,7 @@ public abstract class AbstractContextLoaderInitializer implements WebApplication
 	protected void registerContextLoaderListener(ServletContext servletContext) {
 		WebApplicationContext rootAppContext = createRootApplicationContext();
 		if (rootAppContext != null) {
+			// 将关联的ContextLoaderListener注册到servlet监听器中,而ContextLoaderListener包含根应用上下文
 			servletContext.addListener(new ContextLoaderListener(rootAppContext));
 		}
 		else {
@@ -64,6 +68,9 @@ public abstract class AbstractContextLoaderInitializer implements WebApplication
 	}
 
 	/**
+	 * 这里就是创建根应用上下文,提供给 ContextLoaderListener,即注册到servlet context上,以便javax 的servlet容器可以
+	 * 在创建时创发该监听器相关动作.一般,在WebApplicationContext中包含中间层服务,数据源操作等.
+	 *
 	 * Create the "<strong>root</strong>" application context to be provided to the
 	 * {@code ContextLoaderListener}.
 	 * <p>The returned context is delegated to
