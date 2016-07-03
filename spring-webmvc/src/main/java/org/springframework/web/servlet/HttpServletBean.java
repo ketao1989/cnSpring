@@ -16,15 +16,6 @@
 
 package org.springframework.web.servlet;
 
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeanWrapper;
@@ -45,7 +36,17 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.context.support.ServletContextResourceLoader;
 import org.springframework.web.context.support.StandardServletEnvironment;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
+ * 简单地扩展HttpServlet,将web.xml配置的一些tag参数init-param 作为bean的属性.
+ *
  * Simple extension of {@link javax.servlet.http.HttpServlet} which treats
  * its config parameters ({@code init-param} entries within the
  * {@code servlet} tag in {@code web.xml}) as bean properties.
@@ -85,6 +86,7 @@ public abstract class HttpServletBean extends HttpServlet
 	protected final Log logger = LogFactory.getLog(getClass());
 
 	/**
+	 * 必须有的属性的集合,一些必须得参数给servlet.
 	 * Set of required properties (Strings) that must be supplied as
 	 * config parameters to this servlet.
 	 */
@@ -94,6 +96,8 @@ public abstract class HttpServletBean extends HttpServlet
 
 
 	/**
+	 * 子类调用这个方法,将解析必须要有的属性配置,放到set中去
+	 *
 	 * Subclasses can invoke this method to specify that this property
 	 * (which must match a JavaBean property they expose) is mandatory,
 	 * and must be supplied as a config parameter. This should be called
@@ -107,6 +111,10 @@ public abstract class HttpServletBean extends HttpServlet
 	}
 
 	/**
+	 * 映射 servlet config的参数配置到 servlet的bean属性中.
+	 *
+	 * TODO 当我们有全局数据,需要在初始化的时候去构建,则可以子类实现initServletBean方法完成.
+	 *
 	 * Map config parameters onto bean properties of this servlet, and
 	 * invoke subclass initialization.
 	 * @throws ServletException if bean properties are invalid (or required
@@ -174,6 +182,8 @@ public abstract class HttpServletBean extends HttpServlet
 
 
 	/**
+	 * 子类来实现的自定义的初始化工作
+	 *
 	 * Subclasses may override this to perform custom initialization.
 	 * All bean properties of this servlet will have been set before this
 	 * method is invoked.
@@ -215,6 +225,8 @@ public abstract class HttpServletBean extends HttpServlet
 
 
 	/**
+	 * 将ServletConfig的配置的初始化参数 转换为 bean 内部的属性值对象,该对象就是如下,其继承了ioc bean 通用的解析数据结构
+	 *
 	 * PropertyValues implementation created from ServletConfig init parameters.
 	 */
 	private static class ServletConfigPropertyValues extends MutablePropertyValues {
