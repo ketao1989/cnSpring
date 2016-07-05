@@ -9,17 +9,8 @@
 
 package org.springframework.web.context;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.concurrent.ConcurrentHashMap;
-import javax.servlet.ServletContext;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.access.BeanFactoryLocator;
 import org.springframework.beans.factory.access.BeanFactoryReference;
@@ -38,7 +29,20 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
+import javax.servlet.ServletContext;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
+ * 执行实际的根web application context 初始化工作.由配置在web.xml的listener 之ContextLoaderListener调用.
+ *
+ * 默认,application context 为 XmlWebApplicationContext.自定义的context需要实现 ConfigurableWebApplicationContext 接口.
+ * 默认,contextConfigLocation 配置文件的地址为 /WEB-INF/applicationContext.xml for XmlWebApplicationContext.
+ *
  * Performs the actual initialization work for the root application context. Called by {@link ContextLoaderListener}.
  * 
  * <p>
@@ -195,7 +199,7 @@ public class ContextLoader {
     /**
      * The root WebApplicationContext instance that this loader manages.
      */
-    private WebApplicationContext context;
+    private WebApplicationContext context;//loader 对应的 根WebApplicationContext实例
 
     /**
      * Holds BeanFactoryReference when loading parent factory via ContextSingletonBeanFactoryLocator.
@@ -254,11 +258,14 @@ public class ContextLoader {
      * @see #initWebApplicationContext(ServletContext)
      * @see #closeWebApplicationContext(ServletContext)
      */
+    // 设置父context
     public ContextLoader(WebApplicationContext context) {
         this.context = context;
     }
 
     /**
+     * 为指定的servlet context 初始化 spring web application context 上下文,使用构造函数提供的,还是参数contextConfigLocation构造个.
+     *
      * Initialize Spring's web application context for the given servlet context, using the application context provided
      * at construction time, or creating a new one according to the "{@link #CONTEXT_CLASS_PARAM contextClass}" and "
      * {@link #CONFIG_LOCATION_PARAM contextConfigLocation}" context-params.
@@ -302,6 +309,8 @@ public class ContextLoader {
                     configureAndRefreshWebApplicationContext(cwac, servletContext);
                 }
             }
+
+            // todo 这里把 root application context 设置到 servlet context 中去
             servletContext.setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, this.context);
 
             ClassLoader ccl = Thread.currentThread().getContextClassLoader();
@@ -403,10 +412,14 @@ public class ContextLoader {
         }
 
         customizeContext(sc, wac);
+
+        // 这里调用 spring ioc 的 refresh 方法,进行初始化工作
         wac.refresh();
     }
 
     /**
+     * 根据配置文件,自定义创建ConfigurableWebApplicationContext 上下文
+     *
      * Customize the {@link ConfigurableWebApplicationContext} created by this ContextLoader after config locations have
      * been supplied to the context but before the context is <em>refreshed</em>.
      * <p>
@@ -425,6 +438,8 @@ public class ContextLoader {
      * @see ApplicationContextInitializer#initialize(ConfigurableApplicationContext)
      */
     protected void customizeContext(ServletContext sc, ConfigurableWebApplicationContext wac) {
+
+        // 如果没有设置*InitializerClasses属性,则返回,不创建自定义上下文
         List<Class<ApplicationContextInitializer<ConfigurableApplicationContext>>> initializerClasses = determineContextInitializerClasses(sc);
         if (initializerClasses.isEmpty()) {
             // no ApplicationContextInitializers have been declared -> nothing to do

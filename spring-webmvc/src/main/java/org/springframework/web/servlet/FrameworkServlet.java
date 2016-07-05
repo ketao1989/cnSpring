@@ -180,13 +180,13 @@ public abstract class FrameworkServlet extends HttpServletBean {
 	private String contextAttribute;
 
 	/** WebApplicationContext implementation class to create */
-	private Class<?> contextClass = DEFAULT_CONTEXT_CLASS;
+	private Class<?> contextClass = DEFAULT_CONTEXT_CLASS; //默认的XmlWebApplicationContext类
 
 	/** WebApplicationContext id to assign */
 	private String contextId;//分配的WebApplicationContext id
 
 	/** Namespace for this servlet */
-	private String namespace;
+	private String namespace;//默认为xxx-servlet
 
 	/** Explicit context config location */
 	private String contextConfigLocation;
@@ -217,7 +217,7 @@ public abstract class FrameworkServlet extends HttpServletBean {
 	private WebApplicationContext webApplicationContext;//该servlet对应的WebApplicationContext
 
 	/** Flag used to detect whether onRefresh has already been called */
-	private boolean refreshEventReceived = false;// 是否执行refresh操作
+	private boolean refreshEventReceived = false;// 是否已经执行refresh操作
 
 
 	/**
