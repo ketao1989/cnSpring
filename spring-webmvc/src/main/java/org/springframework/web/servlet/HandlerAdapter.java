@@ -20,6 +20,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
+ * MVC框架 SPI接口,允许核心MVC流程的参数化.
+ *
+ * 每一个handler类型都必须实现的接口,来处理一个请求.
+ *
  * MVC framework SPI interface, allowing parameterization of core MVC workflow.
  *
  * <p>Interface that must be implemented for each handler type to handle a request.

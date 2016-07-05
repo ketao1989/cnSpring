@@ -758,6 +758,8 @@ public class DispatcherServlet extends FrameworkServlet {
 	}
 
 	/**
+	 * 默认,从DispatcherServlet.properties获取handlerMapping类,默认使用BeanNameUrlHandlerMapping
+	 *
 	 * Create a List of default strategy objects for the given strategy interface.
 	 * <p>The default implementation uses the "DispatcherServlet.properties" file (in the same
 	 * package as the DispatcherServlet class) to determine the class names. It instantiates
