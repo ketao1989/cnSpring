@@ -437,14 +437,32 @@ public class DispatcherServlet extends FrameworkServlet {
 	 * <p>May be overridden in subclasses in order to initialize further strategy objects.
 	 */
 	protected void initStrategies(ApplicationContext context) {
+
+		// 设置处理文件上传的逻辑类MultipartResolver
 		initMultipartResolver(context);
+
+		// 设置国际化配置
 		initLocaleResolver(context);
+
+		// 设置主题,默认为FixedThemeResolver.主题名,可以根据不同的请求参数,加载不同的配置文件
 		initThemeResolver(context);
+
+		// 初始化 HandlerMappings
 		initHandlerMappings(context);
+
+		// 初始化 HandlerAdapters
 		initHandlerAdapters(context);
+
+		// 初始化 异常处理拦截器,最后封装异常,然后按照指定处理返回出去
 		initHandlerExceptionResolvers(context);
+
+		// 初始化 转换器 ,默认为 DefaultRequestToViewNameTranslator
 		initRequestToViewNameTranslator(context);
+
+		// 初始化 视图解析器 ,默认为InternalResourceViewResolver
 		initViewResolvers(context);
+
+		//默认为 DefaultFlashMapManager
 		initFlashMapManager(context);
 	}
 
